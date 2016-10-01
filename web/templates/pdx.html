@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+dl { padding-bottom:5px;}
+</style>
+
+<div class="panel panel-primary">
+  <!-- Default panel contents -->
+  <div class="panel-heading"><h2>{{ pdx.data_source}} PDX model {{pdx.external_id}}</h2></div>
+  <div class="panel-body">
+
+    <div class="row">
+
+      <div class="col-md-6">
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <h3 class="panel-title">Diagnosis</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="dl-horizontal">
+                <dt>Diagnosis</dt>
+                <dd>{{pdx.human_tumor.diagnosis}}</dd>
+                <dt>Tissue / Type</dt>
+                <dd>{{pdx.human_tumor.tissue_of_origin}} / {{pdx.human_tumor.tumor_type}}</dd>
+                <dt>Stage</dt>
+                <dd>{{pdx.human_tumor.patient_snapshot.stage}}</dd>
+                <dt>Classification</dt>
+                <dd>{{pdx.human_tumor.classification}}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <h3 class="panel-title">Patient information</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="dl-horizontal">
+              <dt>Sex</dt>
+              <dd>{{pdx.human_tumor.patient_snapshot.patient.sex}}</dd>
+              <dt>Age</dt>
+              <dd>{{pdx.human_tumor.patient_snapshot.age}}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="row">
+
+      <div class="col-md-6">
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <h3 class="panel-title">PDX details</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="dl-horizontal">
+                <dt>Passge</dt>
+                <dd>{{ pdx.passage_number|default_if_none:"No information" }}</dd>
+                <dd>{{ pdx.mouse.name|default_if_none:"No information" }}</dd>
+                <dt>Implanation type</dt>
+                <dd>{{ pdx.implantation_type|default_if_none:"No information" }}</dd>
+                <dt>Implantation site</dt>
+                <dd>{{ pdx.implantation_site|default_if_none:"No information" }}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <h3 class="panel-title">Validation</h3>
+          </div>
+          <div class="panel-body">
+            <strong>{{ pdx.validation_set.first }}</strong>
+
+            {% if pdx.human_tumor.marker_set.all %}
+            <h4>Human</h4>
+            <dl class="dl-horizontal">
+              {% for marker in pdx.human_tumor.marker_set.all %}
+                <dt>Marker</dt>
+                <dd>{{marker.gene}}</dd>
+                <dt>Description</dt>
+                <dd>{{marker.details}}</dd>
+            {% empty %}
+                <p>No human validation results found in dataset.</p>
+            {% endfor %}
+            </dl>
+            {% else %}
+            <p>No validation information for human</p>
+            {% endif %}
+
+            {% if pdx.mouse_tumor.marker_set.all %}
+            <h4>Mouse</h4>
+            <dl class="dl-horizontal">
+              {% for marker in pdx.mouse_tumor.marker_set.all %}
+                <dt>Marker</dt>
+                <dd>{{marker.gene}}</dd>
+                <dt>Description</dt>
+                <dd>{{marker.details}}</dd>
+            {% empty %}
+                <p>No pdx mouse validation results found in dataset.</p>
+            {% endfor %}
+            </dl>
+            {% else %}
+            <p>No validation information for pdx mouse</p>
+            {% endif %}
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+	</ul>
+
+	<br />
+  	<a href="http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID={{pdx.external_id}}">View data at {{ pdx.data_source}}</a>
+
+  </div>
+ </div>
+
+
+
+
+{% endblock %}

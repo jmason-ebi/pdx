@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="panel panel-primary">
+  	{% if not query_string %}<div class="panel-heading">Please enter a search term</div>{% endif %}
+  <div class="panel-body">
+    <form class="" action="{% url 'search' %}" >
+	  <div class="input-group">
+		<input type="text" autofocus data-modalfocus class="form-control" name="q" placeholder="{% if not query_string %}Enter a search e.g. 'lung', 'blood', 'primary', etc.{% else %}Search again...{% endif %}">
+        <span class="input-group-btn">
+		  <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</button>
+		</span>
+	  </div>
+    </form>
+  </div>
+</div>
+
+
+{% if query_string %}
+<div class="panel panel-primary">
+  <!-- Default panel contents -->
+  <div class="panel-heading">You searched for "{{ query_string }}" and the results are listed below.</div>
+  <div class="panel-body">
+  </div>
+
+<table id="search-results" class="table table-striped">
+	<thead>
+		<tr>
+			<th>Data&nbsp;Source</th>
+			<th>Tissue&nbsp;of&nbsp;origin</th>
+			<th>Type</th>
+			<th>Classification</th>
+			<th>Details</th>
+		</tr>
+	</thead>
+	<tbody>
+{% for entry in found_entries %}
+<tr>
+	<td>{{ entry.human_tumor.data_source.name }} {{ entry.mouse_tumor.data_source.name }}</td>
+	<td>{{ entry.tissue_of_origin }}</td>
+	<td>{{ entry.tumor_type }}</td>
+	<td>{{ entry.classification }}</td>
+	<td>
+		<a href="/pdx/{{entry.human_tumor.pk}}">
+		{% if entry.human_tumor.data_source.name == "EUROPDX" %}
+		{{entry.tissue_of_origin}} {{entry.tumor_type}} (Diagnosis: {{entry.diagnosis}}) 
+		{% elif entry.human_tumor.data_source.name == "JAX" %}
+		{{entry.tissue_of_origin}} {{entry.tumor_type}} tumor (diagnosis: {{entry.diagnosis}}) 
+		{% elif entry.human_tumor.data_source.name == "PROXE" %}
+		{{entry.tissue_of_origin}} {{entry.tumor_type}} (Diagnosis: {{entry.diagnosis}}) 
+		{% endif %}
+		</a>
+	</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<script>
+$(document).ready(function() {
+  $('#search-results').dataTable({
+    language: {
+        sSearch: "Filter results:"
+    }
+});
+});
+</script>
+
+{% endif %}
+
+{% endblock %}
